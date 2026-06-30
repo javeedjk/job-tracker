@@ -12,12 +12,14 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title="Job Application Tracker")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://job-tracker-ten-beige.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 
 # ---------- USER ROUTES ----------
