@@ -4,7 +4,7 @@ import { getApplications, deleteApplication } from "../api/applications";
 import { logout } from "../api/auth";
 import ApplicationForm from "./ApplicationForm";
 
-function Dashboard() {
+function Dashboard({ onLogout }) {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,6 +29,7 @@ function Dashboard() {
 
   function handleLogout() {
     logout();
+    onLogout();
     navigate("/login");
   }
 

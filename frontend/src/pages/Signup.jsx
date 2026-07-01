@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { signup, login } from "../api/auth";
 
-function Signup() {
+function Signup({ onLogin }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,7 +14,8 @@ function Signup() {
     setError("");
     try {
       await signup(name, email, password);
-      await login(email, password); // auto-login right after signup
+      await login(email, password);
+      onLogin();
       navigate("/dashboard");
     } catch (err) {
       if (err.response?.status === 400) {
