@@ -11,3 +11,4 @@ frontend/dist/
 # General
 .DS_Store
 *.pyc
+backend/test.db 
