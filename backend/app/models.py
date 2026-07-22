@@ -13,6 +13,13 @@ class ApplicationStatus(str, enum.Enum):
     WITHDRAWN = "Withdrawn"
 
 
+class ResearchStatus(str, enum.Enum):
+    NOT_STARTED = "not_started"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -22,7 +29,6 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # This lets us do user.applications to get all jobs they've applied to
     applications = relationship("Application", back_populates="owner")
 
 
@@ -39,8 +45,12 @@ class Application(Base):
     job_url = Column(String, nullable=True)
     notes = Column(Text, nullable=True)
 
+    # --- new: company research agent fields ---
+    research_report = Column(Text, nullable=True)
+    research_status = Column(Enum(ResearchStatus), default=ResearchStatus.NOT_STARTED, nullable=False)
+    research_generated_at = Column(DateTime, nullable=True)
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # This lets us do application.owner to get the user who owns it
     owner = relationship("User", back_populates="applications")
