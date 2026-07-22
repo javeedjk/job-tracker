@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -8,6 +8,7 @@ from app import models, schemas, crud
 from app.database import engine, get_db
 from app.auth import create_access_token, get_current_user
 from app.security import verify_password
+from app.research_task import run_research_task
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title="Job Application Tracker")
 app.add_middleware(
@@ -106,3 +107,35 @@ def delete_application(
     if not app_obj:
         raise HTTPException(status_code=404, detail="Application not found")
     return {"detail": "Application deleted successfully"}
+
+
+# ---------- COMPANY RESEARCH AGENT ROUTES ----------
+
+@app.post("/applications/{application_id}/research")
+def trigger_research(
+    application_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    app_obj = crud.get_application(db, application_id, user_id=current_user.id)
+    if not app_obj:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    app_obj.research_status = models.ResearchStatus.IN_PROGRESS
+    db.commit()
+
+    background_tasks.add_task(run_research_task, application_id)
+    return {"detail": "Research started", "status": "in_progress"}
+
+
+@app.get("/applications/{application_id}/research", response_model=schemas.ResearchStatusOut)
+def get_research(
+    application_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    app_obj = crud.get_application(db, application_id, user_id=current_user.id)
+    if not app_obj:
+        raise HTTPException(status_code=404, detail="Application not found")
+    return app_obj
