@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getApplications, deleteApplication } from "../api/applications";
 import { logout } from "../api/auth";
 import ApplicationForm from "./ApplicationForm";
+import ResearchModal from "./ResearchModal";
 
 function Dashboard({ onLogout }) {
   const [applications, setApplications] = useState([]);
@@ -11,6 +12,7 @@ function Dashboard({ onLogout }) {
   const [showForm, setShowForm] = useState(false);
   const [editingApp, setEditingApp] = useState(null);
   const navigate = useNavigate();
+  const [researchingApp, setResearchingApp] = useState(null);
 
   async function fetchData() {
     try {
@@ -134,6 +136,12 @@ function Dashboard({ onLogout }) {
                   >
                     Delete
                   </button>
+                  <button
+                    onClick={() => setResearchingApp(app)}
+                    className="text-blue-400 hover:text-blue-300 text-sm"
+                  >
+                    Research
+                  </button> 
                 </div>
               </div>
             ))}
@@ -146,6 +154,12 @@ function Dashboard({ onLogout }) {
           existingApp={editingApp}
           onClose={closeForm}
           onSaved={handleSaved}
+        />
+      )}
+      {researchingApp && (
+        <ResearchModal
+        app={researchingApp}
+        onClose={() => setResearchingApp(null)}
         />
       )}
     </div>
